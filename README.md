@@ -98,8 +98,9 @@ node tests/smoke-test.cjs
 
 ## 部署
 
-- Cloudflare Pages 发布目录：`public`
-- Render 启动命令：`npm start`
+- Cloudflare Pages：`https://math-aihzcc.pages.dev`
+- Render API：`https://math-aihzcc-api.onrender.com`
+- GitHub：`https://github.com/hhzz-svg/math-aihzcc`
 - 目标域名：`math.aihzcc.top`
 
-完整步骤见 `docs/部署指南.md`。
+目标域名已经绑定到 Pages 项目；还需要在 Cloudflare DNS 添加 `math` → `math-aihzcc.pages.dev` 的代理 CNAME 才会生效。完整步骤见 `docs/部署指南.md`。
