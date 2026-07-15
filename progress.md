@@ -123,3 +123,24 @@
 - `progress.md`：追加本轮施工、测试和回滚记录。
 
 回滚方式：执行 `git revert <本轮提交哈希>` 回滚本轮代码；仅回滚前端时恢复 `public/app.js`、`public/index.html`、`public/styles.css`、`public/data-override.js` 和 `public/assets/reference/pages/`。Cloudflare Pages 与 Render 均可回滚到本轮发布前的部署；本地浏览器 `localStorage` 学习进度需先导出后再清理。
+
+## 2026-07-16 - Task: 验证扩展版学习站线上部署
+
+### What was done
+- 复核 Cloudflare Pages 最新部署、稳定 Pages 域名和自定义域名，确认三个前端入口均已恢复正常访问。
+- 复核 Render 健康检查、站点元数据与今日计划接口，确认后端已完成部署且可正常响应。
+- 使用真实 Edge 浏览器访问自定义域名，验证首页倒计时、章节知识回顾、原书摘页和计划执行单均能渲染。
+
+### Testing
+- `npm test`：通过，覆盖 9 章、81 道题、PDF Range、桌面端与移动端书籍式界面及 KaTeX 渲染。
+- `https://a5bee9ec.math-aihzcc.pages.dev/`：HTTP 200。
+- `https://math-aihzcc.pages.dev/`：HTTP 200。
+- `https://math.aihzcc.top/`：HTTP 200，页面标题及主体内容正确。
+- `https://math-aihzcc-api.onrender.com/api/health`、`/api/meta`、`/api/plan/today`：均为 HTTP 200。
+- `https://math.aihzcc.top/#/chapter/limits`：8 个知识回顾小节与原书摘页均可见；摘页滚动进入视口后成功加载，图片宽度 884 px。
+- `https://math.aihzcc.top/#/plan`：当前周 7 天执行单和 18 周计划表均可见。
+
+### Notes
+- 改动文件：`progress.md`——追加本次生产环境连通性和浏览器验证证据。
+- Cloudflare Browser Insights 脚本会被站点 CSP 阻止，但不影响学习站功能；这是统计脚本而非业务脚本错误。
+- 回滚方式：执行 `git revert <本次记录提交>`；本轮仅增加验证记录，不涉及页面与部署逻辑。
