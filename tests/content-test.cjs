@@ -22,6 +22,7 @@ checks.push(["9 problems per chapter", data.BOOK_CHAPTERS.every((chapter) => [ch
 checks.push(["all chapter problem references valid", data.BOOK_CHAPTERS.every((chapter) => [chapter.exampleId, ...chapter.practiceIds].every((id) => data.problems.some((problem) => problem.id === id && problem.topic === chapter.id)))]);
 checks.push(["unique problem ids", unique(data.problems.map((item) => item.id))]);
 checks.push(["eight rich review sections", data.BOOK_CHAPTERS.every((chapter) => chapter.sections.length >= 8 && chapter.sections.every((section) => section.body.length > 70 && section.cue))]);
+checks.push(["chapter review subjects are distinct", unique(data.BOOK_CHAPTERS.map((chapter) => chapter.sections[0]?.title))]);
 checks.push(["all chapters map to PDF pages", data.BOOK_CHAPTERS.every((chapter) => chapter.pdfPages.length && chapter.pdfPages.every((page) => page >= 26 && page <= 29) && chapter.pdfAssets.length === chapter.pdfPages.length)]);
 checks.push(["10 past paper entries", data.PAPER_INDEX.length === 10]);
 checks.push(["paper pages ordered", data.PAPER_INDEX.every((item, index) => index === 0 || item.paperPage >= data.PAPER_INDEX[index - 1].paperPage)]);

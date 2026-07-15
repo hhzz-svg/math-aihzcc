@@ -63,7 +63,7 @@ const chapterDetails = {
     ["区域与换序", "先画 D，再写 x 型或 y 型切片；换序要重新求边界，交点随参数改变时要分段。"],
     ["极坐标", "x=r cosθ、y=r sinθ，面积元 r drdθ；圆、扇形及含 x²+y² 的函数优先用极坐标，角度不能重复覆盖。"],
     ["三重坐标", "柱坐标适合圆柱，体积元 r drdθdz；球坐标适合球和锥面，体积元 ρ²sinφ dρdφdθ。"],
-    ["对称性", "区域和函数同时在变换下满足不变/变号才能用对称；写出变换比凭图猜更可靠。"],
+    ["对称性", "区域和函数同时在变换下满足不变/变号才能用对称；写出变换比凭图猜更可靠。例如关于 y 轴对称的区域上，关于 x 的奇函数积分为零。"],
     ["参数区域", "先求边界相交的临界参数，再画图和分段；一套积分限不能强行覆盖所有参数范围。"],
     ["体积质量质心", "体积是 ∫1，质量是 ∫ρ，质心由一阶矩除总质量；应用题先写微元=密度×几何微元。"],
     ["估计与平均值", "m≤f≤M 时积分夹在面积乘 m、M 之间；用量级和正负检查重积分结果，能抓边界错误。"],
@@ -95,7 +95,7 @@ const detailChapterIds = Object.keys(chapterDetails);
 const canonicalChapterId = { geometry: "vector", multidiff: "multivariable", multiple: "multiple-integral", vectorcalc: "line-surface" };
 const canonicalToBookId = { vector: "geometry", multivariable: "multidiff", "multiple-integral": "multiple", "line-surface": "vectorcalc" };
 for (const chapter of BOOK_CHAPTERS) {
-  const details = chapterDetails[chapter.id] || chapterDetails.limits;
+  const details = chapterDetails[canonicalChapterId[chapter.id] || chapter.id];
   chapter.sections = details.map(([title, body], index) => ({ title, body: `${body} 本节练习时，先把定义、使用条件和一个最小例子写在纸上，再进入题目。`, cue: ["先说对象与范围，再动笔。", "看到这个结构就启动对应工具。", "算到首个决定结论的项就停。", "候选值必须补证明或边界检查。", "结果最后用符号、量级或代回验算。", "证明题把定理条件写在结论前。", "不要把局部结论延伸到边界。", "每题写一句‘我为什么选这个入口’。"][index] }));
   chapter.pdfAssets = (chapter.pdfPages || []).map((page) => `guide-${String(page).padStart(3, "0")}.jpg`);
 }
