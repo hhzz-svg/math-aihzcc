@@ -1,2 +1,6 @@
 @echo off
-start "" "%~dp0index.html"
+chcp 65001 >nul
+cd /d "%~dp0"
+start "" "http://localhost:4173"
+node server\index.cjs
+pause

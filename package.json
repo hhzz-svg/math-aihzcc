@@ -1,0 +1,13 @@
+﻿{
+  "name": "math-aihzcc-study-book",
+  "version": "2.0.0",
+  "private": true,
+  "description": "书籍式全国大学生数学竞赛学习与刷题站",
+  "scripts": {
+    "start": "node server/index.cjs",
+    "test": "node tests/content-test.cjs && node tests/server-test.cjs && node tests/smoke-test.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

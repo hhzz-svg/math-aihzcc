@@ -1,70 +1,105 @@
-﻿# 数竞冲刺台（2026 全国大学生数学竞赛）
+﻿# 数竞研习录
 
-面向 **非数学专业 A 类初赛** 的本地网页版学习与刷题计划。目标考试日期为 **2026 年 11 月 14 日**。
+面向 **2026 年全国大学生数学竞赛非数学专业 A 类初赛**的书籍式学习与刷题网站。目标不是展示进度数据，而是让知识回顾、例题、练习、解析和参考书页码形成连续阅读体验。
 
-## 直接使用
+## 当前内容
 
-1. 双击 `启动网页版.cmd`；或直接用 Edge / Chrome 打开 `index.html`。
-2. 不需要安装 Node.js、Python 或其他软件。
-3. 题目状态、每日任务、薄弱专题、模拟成绩和连续学习天数保存在当前浏览器的 `localStorage` 中。
-4. 右上角下载按钮可导出 JSON 格式的学习进度；左侧底部可重置全部本地记录。
-5. 数学公式使用本地 KaTeX 0.16.22 渲染，MIT 许可证位于 `assets/vendor/katex/LICENSE`。
+- 9 章高等数学主线，每章包含 4 节知识点回顾、公式、标准流程和易错点。
+- 36 道原创同型题：9 道章内例题、27 道独立练习，均含提示、完整解析、答案和易错点。
+- 18 周训练安排、18 条竞赛方法、前十届非数学专业初赛试题与解答页码索引。
+- 参考指南网页阅读器：本地自动加载项目内 PDF；公开站点可选择电脑上的 PDF，按物理页码直达。
+- 练习状态、本章完成状态和进度导出均保存在浏览器 `localStorage`。
+- Cloudflare Pages 前端配置与 Render Node 后端配置。
 
-## 页面内容
+## 本地使用
 
-- **今日总览**：考试倒计时、当前阶段、每日训练清单、45 分钟专注计时、专题掌握度。
-- **17 周计划**：从 2026-07-15 到 2026-11-13 的六阶段路线，以及固定周训练节奏。
-- **知识地图**：9 个高等数学专题的公式、解题扫描顺序、易错点和达标标准。
-- **题库训练**：36 道原创同型例题，每个专题 4 题，包含提示、完整解析、答案与方法总结。
-- **模拟战场**：6 场阶段模拟，支持 90/120/150 分钟计时、成绩记录与交卷订正。
-- **技巧手册**：18 条可直接执行的做题、订正和考场检查规则。
+双击：
 
-## 备考范围
+```text
+D:\课程资料\数学\竞赛\启动网页版.cmd
+```
 
-本项目默认用户参加 **非数学专业 A 类**。第十八届竞赛通知明确：
+或在项目目录运行：
 
-- 2026 年初赛时间：2026-11-14 09:00–11:30；
-- 非数学专业 A 类和 B 类初赛考试内容均为高等数学；
-- 非数学专业类决赛增加线性代数内容。
+```powershell
+npm start
+```
 
-因此当前网页把初赛高等数学作为唯一主线，暂不把线性代数挤入 11 月前的核心计划。
+然后访问 `http://localhost:4173`。
 
-## 文件结构
+本地参考书放在：
+
+```text
+private/reference/全国大学生数学竞赛参赛指南.pdf
+```
+
+本地服务器支持 PDF byte-range 请求，PDF.js 会按需读取页面，不必一次载入整本文件。
+
+## 页面结构
+
+```text
+卷首
+├─ 第一章 函数、极限与连续
+├─ 第二章 一元函数微分学
+├─ 第三章 一元函数积分学
+├─ 第四章 常微分方程
+├─ 第五章 向量与空间解析几何
+├─ 第六章 多元函数微分学
+├─ 第七章 二重积分与三重积分
+├─ 第八章 曲线、曲面积分与三大公式
+├─ 第九章 无穷级数
+└─ 附录：18 周计划 / 真题索引 / 原书阅读器 / 资料站 / 方法手册
+```
+
+桌面端采用左目录、中正文、右边注的讲义结构；手机端目录变为抽屉，正文保持单栏阅读。
+
+## 项目结构
 
 ```text
 竞赛/
-├─ index.html                  网页入口
-├─ styles.css                 页面样式与响应式布局
-├─ data.js                    计划、知识点、36 道例题、技巧与模拟卷数据
-├─ app.js                     导航、筛选、计时、进度与本地存储逻辑
-├─ 启动网页版.cmd              一键打开网页
-├─ assets/vendor/katex/       本地数学公式渲染依赖
-├─ docs/备考设计与资料来源.md   范围、设计依据与资料来源
-├─ tests/content-test.cjs     内容完整性检查
-├─ tests/smoke-test.cjs       Edge 浏览器交互与响应式冒烟测试
-└─ progress.md                实施与验证日志
+├─ public/                 Cloudflare Pages 静态站点
+│  ├─ index.html
+│  ├─ styles.css
+│  ├─ app.js
+│  ├─ content.js           36 道题与原有专题数据
+│  ├─ book-data.js         书籍章节、知识回顾、计划、真题索引、资料链接
+│  └─ assets/vendor/       KaTeX 与 PDF.js 离线依赖
+├─ server/index.cjs        本地服务器与 Render API
+├─ private/reference/      个人参考书副本，不提交、不公开部署
+├─ tests/                  内容、服务器、浏览器冒烟测试
+├─ docs/                   设计、资料和部署文档
+├─ render.yaml             Render Blueprint
+├─ wrangler.toml           Cloudflare Pages 配置
+└─ 启动网页版.cmd
 ```
+
+## 后端接口
+
+- `GET /api/health`：服务健康、环境和本地参考书可用性。
+- `GET /api/meta`：考试日期、时长和当前训练周。
+- `GET /api/plan/today`：当天训练节奏。
+- `GET /local-reference/guide.pdf`：仅在本地或私有服务器配置了 PDF 时提供，支持 Range。
+
+主站内容不依赖后端；Render 冷启动或暂时不可用时，知识学习和刷题仍能正常工作。
 
 ## 验证
 
-语法与内容检查可直接使用 Node.js 执行：
-
 ```powershell
-node --check data.js
-node --check app.js
+node --check public/content.js
+node --check public/book-data.js
+node --check public/app.js
+node --check server/index.cjs
 node tests/content-test.cjs
+node tests/server-test.cjs
+node tests/smoke-test.cjs
 ```
 
-`tests/smoke-test.cjs` 使用 `playwright-core` 驱动本机 Edge，主要检查页面加载、KaTeX 公式、36 道题、弹窗交互、进度写入、计划卡片和移动端无横向溢出。
+浏览器测试覆盖书籍式布局、九章目录、知识回顾、KaTeX、题目状态、PDF 第 26 页跳转、18 周计划、10 届真题、资料链接和手机目录。
 
-## 主要资料
+## 部署
 
-- 用户提供：《全国大学生数学竞赛参赛指南》（余志坤主编，全国大学生数学竞赛命题组编，科学出版社，2022）。
-- 中国数学会，第十八届全国大学生数学竞赛通知：<https://www.cms.org.cn/Home/notices/notices_details/id/1439.html>
-- 全国大学生数学竞赛网站，第十八届通知文字版：<https://www.cmathc.org.cn/tzgg/545.html>
-- Khan Academy Mastery System：<https://support.khanacademy.org/hc/en-us/articles/360037054451>
-- LeetCode Study Plan：<https://leetcode.com/studyplan/>
+- Cloudflare Pages 发布目录：`public`
+- Render 启动命令：`npm start`
+- 目标域名：`math.aihzcc.top`
 
-更完整的范围判断、内容设计和使用建议见 `docs/备考设计与资料来源.md`。
-
-
+完整步骤见 `docs/部署指南.md`。

@@ -1,0 +1,12 @@
+﻿services:
+  - type: web
+    name: math-aihzcc-api
+    runtime: node
+    buildCommand: npm install --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22

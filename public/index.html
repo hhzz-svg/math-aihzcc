@@ -1,0 +1,78 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3eddf">
+  <meta name="description" content="2026 全国大学生数学竞赛非数学专业 A 类书籍式学习站：知识点回顾、例题、练习、完整解析与原书页码跳转。">
+  <title>数竞研习录｜2026 全国大学生数学竞赛</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+  <script src="content.js"></script>
+  <script src="book-data.js"></script>
+  <script defer src="assets/vendor/katex/katex.min.js"></script>
+  <script defer src="assets/vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#reading-pane">跳到正文</a>
+  <div class="reading-progress" aria-hidden="true"><span id="reading-progress-bar"></span></div>
+
+  <header class="masthead">
+    <button class="toc-toggle" id="toc-toggle" type="button" aria-controls="book-toc" aria-expanded="false">目录</button>
+    <a class="site-title" href="#/home" aria-label="返回卷首">
+      <span class="site-title-main">数竞研习录</span>
+      <span class="site-title-sub">CMC · 2026 非数学专业 A 类</span>
+    </a>
+    <div class="masthead-tools">
+      <label class="search-field">
+        <span class="sr-only">搜索知识点和题目</span>
+        <input id="book-search" type="search" placeholder="检索知识点 / 题目" autocomplete="off">
+      </label>
+      <a class="plain-link" href="#/reference?page=26">原书</a>
+    </div>
+  </header>
+
+  <div class="book-layout">
+    <nav class="book-toc" id="book-toc" aria-label="全书目录">
+      <div class="toc-head">
+        <p>目录</p>
+        <button id="toc-close" type="button" aria-label="关闭目录">×</button>
+      </div>
+      <ol class="toc-list" id="toc-list">
+        <li><a href="#/home" data-route="home"><span>卷首</span><strong>使用这本讲义</strong></a></li>
+      </ol>
+      <div class="toc-appendix">
+        <p>附录</p>
+        <a href="#/plan" data-route="plan">十八周训练安排</a>
+        <a href="#/papers" data-route="papers">历届真题索引</a>
+        <a href="#/reference?page=26" data-route="reference">原书阅读器</a>
+        <a href="#/resources" data-route="resources">补充资料站点</a>
+        <a href="#/methods" data-route="methods">竞赛方法手册</a>
+      </div>
+      <div class="toc-foot">
+        <span id="toc-progress-text">尚未开始</span>
+        <button class="text-button" id="export-progress" type="button">导出进度</button>
+      </div>
+    </nav>
+
+    <main class="reading-pane" id="reading-pane" tabindex="-1">
+      <article class="book-page" id="book-page" aria-live="polite"></article>
+    </main>
+
+    <aside class="margin-column" id="margin-column" aria-label="页边注"></aside>
+  </div>
+
+  <div class="toc-scrim" id="toc-scrim" hidden></div>
+  <div class="search-results" id="search-results" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <footer class="site-footer">
+    <span>数竞研习录 · 内容优先的个人备考讲义</span>
+    <span>进度保存在当前浏览器</span>
+  </footer>
+</body>
+</html>
+

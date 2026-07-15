@@ -1,29 +1,41 @@
-﻿const fs = require('fs');
-const vm = require('vm');
-const path = require('path');
+﻿const fs = require("node:fs");
+const vm = require("node:vm");
+const path = require("node:path");
 
-const dataPath = path.resolve(__dirname, '..', 'data.js');
-const source = fs.readFileSync(dataPath, 'utf8') + '\nthis.__data={PLAN_META,phases,topics,problems,tips,mockExams,dailyRules};';
+const root = path.resolve(__dirname, "..");
+const contentPath = path.join(root, "public", "content.js");
+const bookPath = path.join(root, "public", "book-data.js");
+const source = `${fs.readFileSync(contentPath, "utf8")}\n${fs.readFileSync(bookPath, "utf8")}\nthis.__data={PLAN_META,phases,weeklyRhythm,topics,problems,tips,mockExams,dailyRules,BOOK_META,BOOK_CHAPTERS,PAPER_INDEX,RESOURCE_LINKS,STUDY_WEEKS};`;
 const sandbox = {};
 vm.createContext(sandbox);
-vm.runInContext(source, sandbox, { filename: dataPath });
-const { PLAN_META, phases, topics, problems, tips, mockExams } = sandbox.__data;
-
-const checks = [];
+vm.runInContext(source, sandbox, { filename: "combined-content.js" });
+const data = sandbox.__data;
 const unique = (items) => new Set(items).size === items.length;
-checks.push(['9 topics', topics.length === 9]);
-checks.push(['topic weights sum to 100', topics.reduce((sum, item) => sum + item.weight, 0) === 100]);
-checks.push(['36 original examples', problems.length === 36]);
-checks.push(['4 examples per topic', topics.every((topic) => problems.filter((p) => p.topic === topic.id).length === 4)]);
-checks.push(['unique problem ids', unique(problems.map((p) => p.id))]);
-checks.push(['all problem topics exist', problems.every((p) => topics.some((t) => t.id === p.topic))]);
-checks.push(['6 study phases', phases.length === 6]);
-checks.push(['phase dates ordered', phases.every((p, i) => i === 0 || phases[i - 1].end < p.start)]);
-checks.push(['exam date after plan', phases.at(-1).end < PLAN_META.examDate]);
-checks.push(['6 mock exams', mockExams.length === 6]);
-checks.push(['all mock references valid', mockExams.every((mock) => mock.problems.every((id) => problems.some((p) => p.id === id)))]);
-checks.push(['18 technique cards', tips.length === 18]);
+const checks = [];
 
-checks.forEach(([name, ok]) => console.log(`${ok ? 'PASS' : 'FAIL'} ${name}`));
+checks.push(["9 knowledge chapters", data.BOOK_CHAPTERS.length === 9]);
+checks.push(["9 topic records", data.topics.length === 9]);
+checks.push(["topic weights sum to 100", data.topics.reduce((sum, item) => sum + item.weight, 0) === 100]);
+checks.push(["36 original problems", data.problems.length === 36]);
+checks.push(["4 problems per chapter", data.BOOK_CHAPTERS.every((chapter) => [chapter.exampleId, ...chapter.practiceIds].length === 4)]);
+checks.push(["all chapter problem references valid", data.BOOK_CHAPTERS.every((chapter) => [chapter.exampleId, ...chapter.practiceIds].every((id) => data.problems.some((problem) => problem.id === id && problem.topic === chapter.id)))]);
+checks.push(["unique problem ids", unique(data.problems.map((item) => item.id))]);
+checks.push(["rich review notes", data.BOOK_CHAPTERS.every((chapter) => chapter.sections.length >= 4 && chapter.sections.every((section) => section.body.length > 70 && section.cue))]);
+checks.push(["all chapters map to PDF pages", data.BOOK_CHAPTERS.every((chapter) => chapter.pdfPages.length && chapter.pdfPages.every((page) => page >= 26 && page <= 29))]);
+checks.push(["10 past paper entries", data.PAPER_INDEX.length === 10]);
+checks.push(["paper pages ordered", data.PAPER_INDEX.every((item, index) => index === 0 || item.paperPage >= data.PAPER_INDEX[index - 1].paperPage)]);
+checks.push(["18 week schedule", data.STUDY_WEEKS.length === 18]);
+checks.push(["9 curated external resources", data.RESOURCE_LINKS.length === 9 && data.RESOURCE_LINKS.every((item) => item.url.startsWith("https://"))]);
+checks.push(["18 competition techniques", data.tips.length === 18]);
+checks.push(["official 2026 exam date", data.BOOK_META.examDate.startsWith("2026-11-14T09:00")]);
+checks.push(["all problem solutions complete", data.problems.every((problem) => problem.statement && problem.hint && problem.solution && problem.answer && problem.trap)]);
+
+const html = fs.readFileSync(path.join(root, "public", "index.html"), "utf8");
+const css = fs.readFileSync(path.join(root, "public", "styles.css"), "utf8");
+checks.push(["book layout present", html.includes("book-layout") && html.includes("book-toc") && html.includes("margin-column")]);
+checks.push(["no dashboard card markup", !html.includes("metric-grid") && !html.includes("problem-card") && !css.includes(".topic-card")]);
+checks.push(["PDF.js bundled", fs.existsSync(path.join(root, "public", "assets", "vendor", "pdfjs", "build", "pdf.min.mjs"))]);
+checks.push(["private PDF available locally", fs.readdirSync(path.join(root, "private", "reference")).some((name) => name.toLowerCase().endsWith(".pdf"))]);
+
+checks.forEach(([name, ok]) => console.log(`${ok ? "PASS" : "FAIL"} ${name}`));
 if (checks.some(([, ok]) => !ok)) process.exit(1);
-
