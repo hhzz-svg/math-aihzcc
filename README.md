@@ -2,6 +2,24 @@
 
 面向 **2026 年全国大学生数学竞赛非数学专业 A 类初赛**的书籍式学习与刷题网站。目标不是展示进度数据，而是让知识回顾、例题、练习、解析和参考书页码形成连续阅读体验。
 
+## 在线访问
+
+- 主站：[https://math.aihzcc.top](https://math.aihzcc.top)
+- Cloudflare Pages 备用站：[https://math-aihzcc.pages.dev](https://math-aihzcc.pages.dev)
+- Render API：[https://math-aihzcc-api.onrender.com](https://math-aihzcc-api.onrender.com)
+- GitHub 仓库：[https://github.com/hhzz-svg/math-aihzcc](https://github.com/hhzz-svg/math-aihzcc)
+
+## 核心特点
+
+- **书籍式学习体验**：采用左侧目录、中间正文、右侧边注的讲义排版，不使用卡片式仪表盘。
+- **知识与刷题结合**：9 章、每章 8 节知识回顾和 9 道题，共 81 道原创同型题。
+- **完整题目反馈**：每道题包含提示、完整解析、答案、易错点、难度和建议用时。
+- **参考书页内嵌**：章节正文直接展示参考指南对应原页，点击可进入 PDF 阅读器并定位物理页码。
+- **可执行 18 周计划**：每周包含 7 天任务、最低题量、交付物、验收标准和未达标回滚。
+- **实时考试倒计时**：以 2026 年 11 月 14 日考试时间为目标，每秒自动刷新。
+- **本地优先、离线依赖**：KaTeX 和 PDF.js 均随项目提供；学习进度保存在浏览器本地。
+- **前后端分离部署**：静态学习站托管于 Cloudflare Pages，轻量 API 部署于 Render。
+
 ## 当前内容
 
 - 9 章高等数学主线，每章包含 8 节知识点回顾、公式、标准流程和易错点。
@@ -99,9 +117,9 @@ node tests/smoke-test.cjs
 
 ## 部署
 
-- Cloudflare Pages：`https://math-aihzcc.pages.dev`
-- Render API：`https://math-aihzcc-api.onrender.com`
-- GitHub：`https://github.com/hhzz-svg/math-aihzcc`
-- 目标域名：`math.aihzcc.top`
+- 主站：[https://math.aihzcc.top](https://math.aihzcc.top)
+- Cloudflare Pages：[https://math-aihzcc.pages.dev](https://math-aihzcc.pages.dev)
+- Render API：[https://math-aihzcc-api.onrender.com](https://math-aihzcc-api.onrender.com)
+- GitHub：[https://github.com/hhzz-svg/math-aihzcc](https://github.com/hhzz-svg/math-aihzcc)
 
-目标域名已经绑定到 Pages 项目；还需要在 Cloudflare DNS 添加 `math` → `math-aihzcc.pages.dev` 的代理 CNAME 才会生效。完整步骤见 `docs/部署指南.md`。
+自定义域名已经绑定到 Cloudflare Pages。完整部署和故障排查步骤见 [`docs/部署指南.md`](docs/部署指南.md)。

@@ -169,3 +169,26 @@
 - 改动文件：`docs/备考设计与资料来源.md`——更新题库规模与每章题量说明。
 - 改动文件：`progress.md`——追加本轮修复、测试与生产部署证据。
 - 回滚方式：执行 `git revert <本次提交>`；Cloudflare 可回滚到部署 `a5bee9ec.math-aihzcc.pages.dev`，但该版本存在第 5–8 章知识正文映射错误。
+
+## 2026-07-16 - Task: 更新项目 README 并同步 GitHub
+
+### What was done
+
+- 在 README 首页增加在线访问入口，集中展示主站、备用站、Render API 和 GitHub 仓库。
+- 增加核心特点说明，突出书籍式排版、知识与刷题结合、参考书页内嵌、18 周计划和离线依赖。
+- 更新部署状态，删除已经失效的 DNS 待办，并将部署地址与部署指南改为可点击链接。
+
+### Testing
+
+- `git diff --check`：通过。
+- `https://math.aihzcc.top`：HTTP 200。
+- `https://math-aihzcc.pages.dev`：HTTP 200。
+- `https://math-aihzcc-api.onrender.com/api/health`：HTTP 200。
+- `https://github.com/hhzz-svg/math-aihzcc`：HTTP 200。
+- README 保持 UTF-8 BOM，四个访问地址均已写入，且不再包含“还需要在 Cloudflare DNS 添加”的过时说明。
+
+### Notes
+
+- 改动文件：`README.md`——增加在线访问与核心特点，更新已生效的部署状态。
+- 改动文件：`progress.md`——追加本轮文档更新、验证和回滚记录。
+- 回滚方式：执行 `git revert <本次提交>`，撤销本轮 README 与进度日志变更。
