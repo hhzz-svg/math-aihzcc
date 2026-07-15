@@ -715,3 +715,44 @@ details.solution-block summary {
   .book-page { padding: 0; }
   details.solution-block > * { display: block; }
 }
+.reference-inset {
+  margin: 48px 0;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.reference-page-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.reference-page {
+  margin: 0;
+}
+
+.reference-page img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(39, 32, 25, .10);
+}
+
+.reference-page figcaption {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: .85rem;
+}
+
+.plan-detail {
+  border-top: 2px solid var(--ink);
+}
+
+@media (max-width: 700px) {
+  .reference-page-grid {
+    grid-template-columns: 1fr;
+  }
+}

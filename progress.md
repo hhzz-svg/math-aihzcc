@@ -88,3 +88,38 @@
 外部状态：GitHub 仓库 `https://github.com/hhzz-svg/math-aihzcc` 当前为公开仓库，以便 Render 在未安装 GitHub App 的情况下拉取；仓库中不含 `private/reference/*.pdf`。自定义域名需在 Cloudflare DNS 手动添加代理 CNAME：`math` → `math-aihzcc.pages.dev`。
 
 回滚方式：代码可执行 `git revert cc7d315 26cd1ce` 创建反向提交；如只需回到第一版卡片仪表盘，可在确认无需保留新版工作后执行 `git reset --hard 12091c3`。Cloudflare Pages 可在控制台回滚到此前部署，Render 可回滚到部署 `dep-d9bq9cd7vvec73c93hhg`；如需移除本轮线上资源，删除 Pages 项目 `math-aihzcc` 与 Render 服务 `srv-d9bq9bt7vvec73c93glg`。个人 PDF 始终位于 Git 忽略目录，回滚代码不会删除该文件。
+
+## 2026-07-16 - Task: 修复 host error 并加深书籍式知识与刷题内容
+
+### What was done
+
+- 修正入口 HTML 的数据覆盖脚本加载，避免前端在加载阶段出现空白页或 host error 表象。
+- 增加章节原书摘页内嵌、实时考试倒计时和当前周可执行计划；章节正文保持连续讲义布局，不引入卡片式仪表盘。
+- 将 9 章内容扩展为每章 8 个知识回顾小节、1 道例题和 8 道练习，并补充提示、完整解析、答案、易错点与方法标签。
+- 修正旧章节 ID 与覆盖数据的映射，确保向量、多元、重积分和曲线曲面积分题目都能正常渲染并归属到正确章节。
+- 生成并纳入轻量 PDF 摘页图片，同时保持完整个人 PDF 不进入公开前端和 Git 历史。
+- 更新内容测试与桌面/手机冒烟测试，覆盖摘页、倒计时、计划执行单和扩展后的题量。
+
+### Testing
+
+- `node --check public/data-override.js`：通过。
+- `node --check public/app.js`、`node --check tests/content-test.cjs`、`node --check tests/smoke-test.cjs`：通过。
+- `npm test`：全部通过；覆盖 9 章、81 道题、每章 8 节回顾、18 周执行计划、PDF 摘页、Render 健康接口、PDF Range、桌面与手机冒烟。
+- 本地 Edge 复测：章节页无 page error，原书摘页图片可见，计划执行单含 7 天任务，倒计时格式为“天 HH:MM:SS”。
+
+### Notes
+
+改动文件清单：
+
+- `.gitignore`：忽略竞赛目录根部个人 PDF，防止 90 MiB 原始资料进入版本库。
+- `public/index.html`：修正 `data-override.js` 的合法脚本标签加载。
+- `public/data-override.js`：新增扩展知识、题库、计划字段和旧章节 ID 映射。
+- `public/app.js`：增加实时倒计时、章节原书摘页和当前周执行单。
+- `public/styles.css`：增加摘页网格、图片说明和计划正文样式。
+- `public/assets/reference/pages/*.jpg`：新增 6 张可公开部署的 PDF 摘页图片。
+- `tests/content-test.cjs`：验证 81 道题、每章 9 道题、8 节回顾、摘页资产和周计划字段。
+- `tests/smoke-test.cjs`：验证倒计时、摘页、计划执行单和移动端布局。
+- `docs/部署指南.md`：补充摘页部署策略、数据覆盖层和 host error 分层排查。
+- `progress.md`：追加本轮施工、测试和回滚记录。
+
+回滚方式：执行 `git revert <本轮提交哈希>` 回滚本轮代码；仅回滚前端时恢复 `public/app.js`、`public/index.html`、`public/styles.css`、`public/data-override.js` 和 `public/assets/reference/pages/`。Cloudflare Pages 与 Render 均可回滚到本轮发布前的部署；本地浏览器 `localStorage` 学习进度需先导出后再清理。

@@ -1,4 +1,4 @@
-﻿const path = require("node:path");
+const path = require("node:path");
 const fs = require("node:fs");
 const os = require("node:os");
 const { spawn } = require("node:child_process");
@@ -53,6 +53,7 @@ async function waitForServer() {
     await page.goto(base, { waitUntil: "networkidle" });
     const checks = [];
     checks.push(["book cover visible", await page.locator(".cover").isVisible()]);
+    checks.push(["live exam countdown visible", await page.locator("#exam-countdown").isVisible() && /^\d+\D+\d{2}:\d{2}:\d{2}$/.test(await page.locator("#exam-countdown").textContent())]);
     checks.push(["nine chapter TOC", (await page.locator("#toc-list [data-chapter]").count()) === 9]);
     checks.push(["no card dashboard", (await page.locator(".problem-card, .topic-card, .metric-grid").count()) === 0]);
     checks.push(["desktop no horizontal overflow", await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)]);
@@ -60,17 +61,21 @@ async function waitForServer() {
     await page.locator('[data-chapter="limits"]').click();
     await page.waitForTimeout(450);
     checks.push(["chapter route", page.url().includes("#/chapter/limits")]);
-    checks.push(["four review sections", (await page.locator('[id^="section-limits-"]').count()) === 4]);
+    checks.push(["eight review sections", (await page.locator('[id^="section-limits-"]').count()) === 8]);
     checks.push(["one worked example", (await page.locator("section.example").count()) === 1]);
-    checks.push(["three chapter exercises", (await page.locator("section.exercise").count()) === 3]);
+    checks.push(["eight chapter exercises", (await page.locator("section.exercise").count()) === 8]);
+    checks.push(["reference excerpt embedded", await page.locator(".reference-inset").isVisible() && (await page.locator(".reference-page img").count()) > 0]);
     checks.push(["KaTeX rendered", (await page.locator(".katex").count()) > 8]);
     checks.push(["no KaTeX error", (await page.locator(".katex-error").count()) === 0]);
 
     await page.locator('section.example details.solution-block').nth(1).locator("summary").click();
     checks.push(["full solution expands", await page.locator('section.example details.solution-block').nth(1).getAttribute("open") !== null]);
-    await page.locator('[data-problem-id="L04"][data-problem-status="mastered"]').click();
+    await page.locator('[data-problem-id="L09"][data-problem-status="mastered"]').click();
     await page.waitForTimeout(250);
-    checks.push(["problem status persists", (await page.locator('[data-problem-id="L04"][data-problem-status="mastered"]').getAttribute("class") || "").includes("is-active")]);
+    checks.push(["problem status persists", (await page.locator('[data-problem-id="L09"][data-problem-status="mastered"]').getAttribute("class") || "").includes("is-active")]);
+
+    await page.goto(`${base}/#/plan`, { waitUntil: "domcontentloaded" });
+    checks.push(["executable current-week plan", await page.locator(".plan-detail").isVisible() && (await page.locator(".plan-detail li").count()) === 7]);
 
     await page.goto(`${base}/#/reference?page=26`, { waitUntil: "domcontentloaded" });
     await page.locator("#pdf-canvas").waitFor({ state: "visible", timeout: 45000 });

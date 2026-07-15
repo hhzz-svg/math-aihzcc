@@ -1,4 +1,4 @@
-﻿(() => {
+(() => {
   "use strict";
 
   const STORAGE_KEY = "math-competition-book-v2";
@@ -14,6 +14,7 @@
 
   let state = loadState();
   let toastTimer = null;
+  let countdownTimer = null;
   let pdfState = { document: null, page: 1, scale: 1.2, rendering: false, pending: null, sourceName: "" };
 
   function loadState() {
@@ -95,10 +96,25 @@
     return problem ? BOOK_CHAPTERS.find((chapter) => chapter.id === problem.topic) : null;
   }
 
-  function daysUntilExam() {
-    const now = new Date();
-    const exam = new Date(BOOK_META.examDate);
-    return Math.max(0, Math.ceil((exam - now) / 86400000));
+  function countdownText() {
+    const diff = new Date(BOOK_META.examDate) - new Date();
+    if (diff <= 0) return "?????/???";
+    const totalSeconds = Math.floor(diff / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${days} \u5929 ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  }
+
+  function startCountdown() {
+    clearInterval(countdownTimer);
+    const tick = () => {
+      const element = document.getElementById("exam-countdown");
+      if (element) element.textContent = countdownText();
+    };
+    tick();
+    countdownTimer = setInterval(tick, 1000);
   }
 
   function currentStudyWeek() {
@@ -176,7 +192,7 @@
         <p class="cover-intro">这不是进度仪表盘，而是一册可以从头读、按章练、随时回查原书页码的个人竞赛讲义。知识回顾在前，例题与练习随后，计划只负责安排节奏。</p>
         <div class="cover-meta">
           <div><span>考试日期</span><strong>2026 年 11 月 14 日</strong></div>
-          <div><span>剩余时间</span><strong>${daysUntilExam()} 天</strong></div>
+          <div><span>剩余时间</span><strong id="exam-countdown">${countdownText()}</strong></div>
           <div><span>当前安排</span><strong>第 ${week.week} 周 · ${week.focus}</strong></div>
         </div>
         <a class="start-reading" href="#/chapter/limits">从第一章开始阅读 →</a>
@@ -269,7 +285,14 @@
     const formulas = topic.formulas.map((item) => `<li>${item}</li>`).join("");
     const steps = topic.steps.map((item) => `<li>${item}</li>`).join("");
     const pitfalls = topic.pitfalls.map((item) => `<li>${item}</li>`).join("");
-    const pageLinks = chapter.pdfPages.map((page) => `<a href="#/reference?page=${page}">原书物理第 ${page} 页</a>`).join(" · ");
+    const pageLinks = chapter.pdfPages.map((page) => `<a href="#/reference?page=${page}">\u539f\u4e66\u7269\u7406\u7b2c ${page} \u9875</a>`).join(" \u00b7 ");
+    const referencePages = (chapter.pdfAssets || []).map((asset, index) => `
+      <figure class="reference-page">
+        <a href="#/reference?page=${chapter.pdfPages[index]}">
+          <img src="assets/reference/pages/${asset}" alt="\u53c2\u8003\u6307\u5357\u7269\u7406\u7b2c ${chapter.pdfPages[index]} \u9875" loading="lazy">
+        </a>
+        <figcaption>\u53c2\u8003\u6307\u5357\u7269\u7406\u7b2c ${chapter.pdfPages[index]} \u9875 \u00b7 \u70b9\u51fb\u653e\u5927\u9605\u8bfb</figcaption>
+      </figure>`).join("");
     const practiceHtml = chapter.practiceIds.map((id) => renderProblem(problemById(id))).join("");
 
     pageEl.innerHTML = `
@@ -277,6 +300,13 @@
       <p class="lede dropcap">${chapter.opening}</p>
       <div class="reference-line"><span>参考指南考纲定位</span>${pageLinks}<span>· 预计占比 ${chapter.examWeight}</span></div>
       ${sectionHtml}
+
+      <section class="reference-inset" id="reference-pages">
+        <span class="section-number">\u539f\u4e66\u8003\u7eb2\u6458\u9875</span>
+        <h2>\u672c\u7ae0\u5bf9\u5e94\u7684\u53c2\u8003\u6307\u5357\u539f\u9875</h2>
+        <p>\u4e0b\u65b9\u9875\u9762\u76f4\u63a5\u5d4c\u5728\u6b63\u6587\u4e2d\uff1b\u70b9\u51fb\u56fe\u7247\u53ef\u8fdb\u5165\u5b8c\u6574 PDF \u9605\u8bfb\u5668\uff0c\u6309\u7269\u7406\u9875\u7801\u7ee7\u7eed\u67e5\u9605\u3002</p>
+        <div class="reference-page-grid">${referencePages}</div>
+      </section>
 
       <section class="chapter-section" id="chapter-methods">
         <span class="section-number">本章方法页</span>
@@ -321,6 +351,7 @@
         <h2>页内目录</h2>
         <ul>
           ${chapter.sections.map((section, index) => `<li><a href="#/chapter/${chapter.id}?anchor=section-${chapter.id}-${index + 1}">${section.title}</a></li>`).join("")}
+          <li><a href="#/chapter/${chapter.id}?anchor=reference-pages">????</a></li>
           <li><a href="#/chapter/${chapter.id}?anchor=chapter-methods">方法页</a></li>
           <li><a href="#/chapter/${chapter.id}?anchor=worked-example">章内例题</a></li>
           <li><a href="#/chapter/${chapter.id}?anchor=practice-set">本章练习</a></li>
@@ -376,9 +407,21 @@
       ${pageHeading("附录一", "十八周训练安排", "计划为知识学习服务：每周只设一个主主题，并保留固定的错题与限时训练节奏。")}
       <p class="lede">你刚学完微积分 2，前半程不需要重新听完整课程，而要用诊断题找出真正薄弱的概念；9 月前补齐多元与线面积分，10 月开始转向整卷和错误决策复盘。</p>
       <table class="plan-table">
-        <thead><tr><th>周</th><th>日期</th><th>主题</th><th>最低交付</th></tr></thead>
+        <thead><tr><th>?</th><th>??</th><th>??</th><th>????</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
+      <section class="chapter-section plan-detail" id="current-week-detail">
+        <span class="section-number">\u5f53\u524d\u5468\u6267\u884c\u5355</span>
+        <h2>\u7b2c ${current.week} \u5468 \u00b7 ${current.focus}</h2>
+        <p>${current.goal}</p>
+        <p><strong>\u5fc5\u5b66\u5c0f\u8282\uff1a</strong>${current.sections}</p>
+        <h3>\u5468\u4e00\u81f3\u5468\u65e5</h3>
+        <ol class="step-list">${current.daily.map((item) => `<li>${item}</li>`).join("")}</ol>
+        <p><strong>\u6700\u4f4e\u9898\u91cf\uff1a</strong>${current.quota}</p>
+        <p><strong>\u672c\u5468\u4ea4\u4ed8\uff1a</strong>${current.output}</p>
+        <p><strong>\u9a8c\u6536\u6807\u51c6\uff1a</strong>${current.check}</p>
+        <p><strong>\u672a\u8fbe\u6807\u56de\u6eda\uff1a</strong>${current.fallback}</p>
+      </section>
       <section class="chapter-section" style="margin-top:52px">
         <span class="section-number">固定节奏</span>
         <h2>每周七天怎么分</h2>
@@ -688,6 +731,7 @@
     searchInput.value = "";
     window.scrollTo({ top: 0, behavior: "auto" });
     setActiveToc(route);
+    clearInterval(countdownTimer);
 
     if (route.section === "chapter") {
       const chapter = BOOK_CHAPTERS.find((item) => item.id === route.id) || BOOK_CHAPTERS[0];
@@ -710,6 +754,7 @@
       document.title = "竞赛方法手册｜数竞研习录";
     } else {
       renderHome();
+      startCountdown();
       renderMath();
       document.title = "数竞研习录｜2026 全国大学生数学竞赛";
     }
