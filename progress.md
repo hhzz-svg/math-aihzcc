@@ -214,3 +214,39 @@
 - 改动文件：`README.md`——重写为面向参赛学生的学习说明，只保留正式网站入口。
 - 改动文件：`progress.md`——追加本轮文档调整、验证和回滚记录。
 - 回滚方式：执行 `git revert <本次提交>`，恢复上一版 README。
+
+## 2026-07-16 - Task: 接入 GitHub 开源题库并扩充知识点
+
+### What was done
+
+- 调研 GitHub 高等数学与微积分项目，筛选 8 个许可证明确的开放题库和交互课件来源；许可证缺失的中文题库未复制入站。
+- 为九章各增加 2 个知识补强小节和 3 道开放拓展题，题量由 81 道增至 108 道，知识回顾由每章 8 节增至 10 节。
+- 新增题目继续提供提示、完整解析、答案、易错点、难度、建议用时和掌握状态，并展示来源作者、GitHub 仓库、许可证与改编说明。
+- 在补充资料页增加“开源题库与课件”来源组，整理 OATutor 与 MathWorks Teaching Resources 的对应学习用途。
+- 将新增内容发布到 Cloudflare Pages，并同步更新学生 README、内容设计、资料来源和部署说明。
+
+### Testing
+
+- `npm test`：全部通过；验证 108 道题、每章 12 道题、每章 10 个知识小节、27 道来源题、18 个来源知识点、8 个许可证来源、PDF Range 和桌面/手机布局。
+- 浏览器逐章验收：九章均显示 10 个知识小节、11 道练习、3 道开放拓展题，KaTeX 错误为 0，页面错误为 0。
+- 资料页显示 17 个资源链接，其中 8 个为 GitHub 开源题库或课件。
+- 8 个 GitHub 来源仓库均返回 HTTP 200。
+- Cloudflare Pages 最终部署 `https://ba633f1e.math-aihzcc.pages.dev`：HTTP 200；自定义域名 `https://math.aihzcc.top`：HTTP 200。
+- 生产 `open-bank-data.js` 与本地 SHA-256 均为 `AD99C5D91E8FA8A9338DFEA7B2F768D03D8BC77ED7911C16859F8ACF72C48C61`。
+- `git diff --check`：通过。
+
+### Notes
+
+- 改动文件：`public/open-bank-data.js`——新增 8 个开放来源、18 个知识点和 27 道完整拓展题。
+- 改动文件：`public/index.html`——在基础数据之后加载开放题库数据层。
+- 改动文件：`public/app.js`——在知识点、题目和资料页展示开放来源与许可证。
+- 改动文件：`public/styles.css`——增加书籍式来源脚注样式。
+- 改动文件：`tests/content-test.cjs`——验证新题量、章节归属、来源、许可证和公式分隔符。
+- 改动文件：`tests/smoke-test.cjs`——逐章验证知识、题量、来源、KaTeX 与桌面/手机布局。
+- 改动文件：`README.md`——面向学生更新为 108 道题、10 节/章和开放题库特点。
+- 改动文件：`docs/开源题库接入说明.md`——记录来源、许可证、改编边界与未采用仓库。
+- 改动文件：`docs/备考设计与资料来源.md`——补充开源来源和题目构成。
+- 改动文件：`docs/书籍式学习站设计.md`——更新章节结构和成功标准。
+- 改动文件：`docs/部署指南.md`——记录开放题库脚本加载顺序与发布检查。
+- 改动文件：`progress.md`——追加本轮接入、测试、部署和回滚记录。
+- 回滚方式：执行 `git revert <本次提交>` 回滚代码与文档；Cloudflare Pages 可回滚到上一稳定部署 `b39226ac.math-aihzcc.pages.dev`。

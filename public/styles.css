@@ -402,6 +402,14 @@ button { color: inherit; }
 .example-label small, .exercise-label small { color: var(--faint); letter-spacing: 0; }
 .example h3, .exercise h3 { margin: 12px 0 14px; font-size: 20px; }
 .problem-statement { font-size: 16px; }
+.source-note {
+  margin: 12px 0 0 !important;
+  color: var(--faint);
+  font: 11px/1.6 var(--sans);
+}
+.source-note span { color: var(--green); }
+.source-note a { color: var(--muted); text-underline-offset: 3px; }
+.source-note a:hover { color: var(--red); }
 .problem-actions {
   display: flex;
   flex-wrap: wrap;

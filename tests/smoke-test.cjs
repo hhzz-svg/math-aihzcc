@@ -61,9 +61,10 @@ async function waitForServer() {
     await page.locator('[data-chapter="limits"]').click();
     await page.waitForTimeout(450);
     checks.push(["chapter route", page.url().includes("#/chapter/limits")]);
-    checks.push(["eight review sections", (await page.locator('[id^="section-limits-"]').count()) === 8]);
+    checks.push(["ten review sections", (await page.locator('[id^="section-limits-"]').count()) === 10]);
     checks.push(["one worked example", (await page.locator("section.example").count()) === 1]);
-    checks.push(["eight chapter exercises", (await page.locator("section.exercise").count()) === 8]);
+    checks.push(["eleven chapter exercises", (await page.locator("section.exercise").count()) === 11]);
+    checks.push(["three attributed open exercises", (await page.locator("section.exercise .source-note").count()) === 3 && (await page.getByText("开放拓展题", { exact: false }).count()) === 3]);
     checks.push(["reference excerpt embedded", await page.locator(".reference-inset").isVisible() && (await page.locator(".reference-page img").count()) > 0]);
     checks.push(["KaTeX rendered", (await page.locator(".katex").count()) > 8]);
     checks.push(["no KaTeX error", (await page.locator(".katex-error").count()) === 0]);
@@ -73,6 +74,20 @@ async function waitForServer() {
     await page.locator('[data-problem-id="L09"][data-problem-status="mastered"]').click();
     await page.waitForTimeout(250);
     checks.push(["problem status persists", (await page.locator('[data-problem-id="L09"][data-problem-status="mastered"]').getAttribute("class") || "").includes("is-active")]);
+
+    let allChaptersComplete = true;
+    for (const chapterId of ["limits", "derivative", "integral", "ode", "geometry", "multidiff", "multiple", "vectorcalc", "series"]) {
+      await page.goto(`${base}/#/chapter/${chapterId}`, { waitUntil: "domcontentloaded" });
+      await page.waitForTimeout(150);
+      const counts = await page.locator("main").evaluate((main) => ({
+        sections: main.querySelectorAll('[id^="section-"]').length,
+        exercises: main.querySelectorAll("section.exercise").length,
+        sources: main.querySelectorAll("section.exercise .source-note").length,
+        mathErrors: main.querySelectorAll(".katex-error").length
+      }));
+      if (counts.sections !== 10 || counts.exercises !== 11 || counts.sources !== 3 || counts.mathErrors !== 0) allChaptersComplete = false;
+    }
+    checks.push(["all nine expanded chapters render", allChaptersComplete]);
 
     await page.goto(`${base}/#/plan`, { waitUntil: "domcontentloaded" });
     checks.push(["executable current-week plan", await page.locator(".plan-detail").isVisible() && (await page.locator(".plan-detail li").count()) === 7]);
@@ -92,7 +107,8 @@ async function waitForServer() {
     checks.push(["10 past papers", (await page.locator(".paper-table tbody tr").count()) === 10]);
     await page.goto(`${base}/#/resources`, { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(250);
-    checks.push(["9 resource links", (await page.locator(".resource-entry").count()) === 9]);
+    checks.push(["17 resource links", (await page.locator(".resource-entry").count()) === 17]);
+    checks.push(["8 open source repositories", (await page.getByText("开源题库与课件", { exact: true }).count()) === 1 && (await page.locator(".resource-entry").filter({ hasText: "许可证" }).count()) === 8]);
     await page.screenshot({ path: path.join(artifactDir, "desktop.png"), fullPage: true });
 
     const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 } });

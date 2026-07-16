@@ -91,6 +91,17 @@
     return problems.find((problem) => problem.id === id);
   }
 
+  function openSourceById(id) {
+    if (!id || typeof OPEN_SOURCE_LIBRARY === "undefined") return null;
+    return OPEN_SOURCE_LIBRARY.find((source) => source.id === id) || null;
+  }
+
+  function renderSourceNote(sourceId, note) {
+    const source = openSourceById(sourceId);
+    if (!source) return "";
+    return `<p class="source-note"><span>开放来源</span><a href="${source.url}" target="_blank" rel="noopener">${source.title}</a> · ${source.creator} · <a href="${source.licenseUrl}" target="_blank" rel="noopener">${source.license}</a>${note ? ` · ${note}` : ""}</p>`;
+  }
+
   function chapterByProblem(id) {
     const problem = problemById(id);
     return problem ? BOOK_CHAPTERS.find((chapter) => chapter.id === problem.topic) : null;
@@ -248,12 +259,13 @@
   function renderProblem(problem, kind = "exercise") {
     const status = state.problems[problem.id] || "";
     const difficulty = "●".repeat(problem.difficulty) + "○".repeat(3 - problem.difficulty);
-    const label = kind === "example" ? "章内例题" : "练习";
+    const label = problem.collection || (kind === "example" ? "章内例题" : "练习");
     return `
       <section class="${kind}" id="exercise-${problem.id}">
         <div class="${kind}-label"><span>${label} · ${problem.id}</span><small>${difficulty} · 建议 ${problem.minutes} 分钟 · ${problem.skill}</small></div>
         <h3>${problem.title}</h3>
         <div class="problem-statement">${problem.statement}</div>
+        ${renderSourceNote(problem.sourceId, problem.sourceNote)}
         <div class="problem-actions" aria-label="题目状态">
           <button class="status-button ${status === "mastered" ? "is-active" : ""}" data-problem-status="mastered" data-problem-id="${problem.id}" type="button">✓ 已掌握</button>
           <button class="status-button ${status === "review" ? "is-active" : ""}" data-problem-status="review" data-problem-id="${problem.id}" type="button">↺ 待回炉</button>
@@ -275,13 +287,17 @@
     const currentIndex = BOOK_CHAPTERS.findIndex((item) => item.id === chapter.id);
     const previous = BOOK_CHAPTERS[currentIndex - 1];
     const next = BOOK_CHAPTERS[currentIndex + 1];
-    const sectionHtml = chapter.sections.map((section, index) => `
-      <section class="chapter-section" id="section-${chapter.id}-${index + 1}">
-        <span class="section-number">${chapter.number} · ${index + 1}</span>
-        <h2>${section.title}</h2>
-        <p>${section.body}</p>
-        <p class="method-cue">方法触发器：${section.cue}</p>
-      </section>`).join("");
+    const sectionHtml = chapter.sections.map((section, index) => {
+      const sourceNote = section.sourceId ? "知识脉络参考并按竞赛要求重写" : "";
+      return `
+        <section class="chapter-section" id="section-${chapter.id}-${index + 1}">
+          <span class="section-number">${chapter.number} · ${index + 1}</span>
+          <h2>${section.title}</h2>
+          <p>${section.body}</p>
+          <p class="method-cue">方法触发器：${section.cue}</p>
+          ${renderSourceNote(section.sourceId, sourceNote)}
+        </section>`;
+    }).join("");
     const formulas = topic.formulas.map((item) => `<li>${item}</li>`).join("");
     const steps = topic.steps.map((item) => `<li>${item}</li>`).join("");
     const pitfalls = topic.pitfalls.map((item) => `<li>${item}</li>`).join("");
@@ -472,8 +488,8 @@
           <div><a href="${item.url}" target="_blank" rel="noopener"><h2>${item.title} ↗</h2><p>${item.description}</p></a></div>
         </article>`).join("")}`).join("");
     pageEl.innerHTML = `
-      ${pageHeading("附录四", "补充资料站点", "把外部站点当作查漏、直观和验算工具，不把浏览资料误当作完成训练。")}
-      <p class="lede">同一个知识点只保留一个主讲义和一个补充解释来源。看完视频或网页后，必须立刻做一道题；否则“看懂了”很难转化为竞赛中的独立书写。</p>
+      ${pageHeading("附录四", "补充资料站点", "包含已接入的开源题库与交互课件，也保留查漏、直观和验算工具。")}
+      <p class="lede">“开源题库与课件”中的内容已经筛选许可证并转化为章内拓展题；外部站点只用于补充。看完视频或网页后，必须立刻做一道题，否则“看懂了”很难转化为竞赛中的独立书写。</p>
       ${content}`;
     marginEl.innerHTML = `
       <section class="margin-note"><h2>使用规则</h2><ul><li>课程站点用于补概念</li><li>作图站点用于建立直观</li><li>计算站点只用于最后验算</li></ul></section>
